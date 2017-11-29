@@ -60,7 +60,7 @@ def barcode_scanner():
     # if not str, return 0
     # else, return results[0][1]?
     camera.capture('foo.jpg')
-    barcode = scan_image.read_barcode('monster.jpg')
+    barcode = scan_image.read_barcode('foo.jpg')
     if (barcode):
         print(barcode)
     else:
@@ -68,8 +68,9 @@ def barcode_scanner():
     return barcode
     
 # regularly check if there's a barcode in view of the webcam and if so, alert Arduino
-def loop(database, ser):
+def loop(database):#, ser):
     while(True):
+        time.sleep(2)
         barcode = barcode_scanner()
         #if (barcode):
         #    if (barcode in database):
@@ -89,10 +90,10 @@ def loop(database, ser):
 
 # initialize serial connection and database, then begin the infinite loop
 def main():
-    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=8)
+#    ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=8)
     # might want to delay so camera can warm up
     database = initialize_database()
-    loop(database, ser)
+    loop(database)#, ser)
   
 if __name__== "__main__":
     main()
