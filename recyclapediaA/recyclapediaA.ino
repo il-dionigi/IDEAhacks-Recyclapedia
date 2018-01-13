@@ -4,7 +4,6 @@
 #include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
 #include "Adafruit_LEDBackpack.h"
-#include <Wire.h> 
 
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4(); 
 
@@ -22,15 +21,14 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 long debounceDelay = 1500;
 long lastDebounceTime = 0;
 int count = 0; 
-#define SLAVE_ADDRESS 0x04
 
-int readPi(){
+void readPi(int numByte){
   while(Wire.available()){
     
   }
 }
 
-void writePi(String msg) {
+void writePi() {
   
 }
 
@@ -83,6 +81,15 @@ void controlLED(const int LED, const int power){
   }
 }
 
+//Return 1 if read a button, return 0 if no button read
+int buttonRead(int buttonState[3]){
+  int result = 0;
+  if(buttonState[0] == HIGH || buttonState[1] == HIGH || buttonState[2] == HIGH){
+    result = 1;  
+  }
+  return result; 
+}
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(LED_G, OUTPUT);
@@ -92,11 +99,6 @@ void setup() {
   pinMode(BUTTON_YES, INPUT);
   pinMode(BUTTON_NO, INPUT);
   pinMode(BUTTON_UNSURE, INPUT);
-
-  //Initialize Arduino as Slave
-  Wire.begin(SLAVE_ADDRESS);
-  Wire.onReceive(readPi);
-  Wire.onRequest(writePi);
   
   Serial.begin(9600);
   alpha4.begin(0x70); //pass in the address for the display
@@ -125,62 +127,6 @@ void loop() {
   buttonPress(buttonState[0], 'G');
   buttonPress(buttonState[1], 'R');
   buttonPress(buttonState[2], 'B');
-  /*while (1) {
-    buttonState[0] = digitalRead(BUTTON_YES);
-    buttonState[1] = digitalRead(BUTTON_NO);
-    buttonState[2] = digitalRead(BUTTON_UNSURE);
-
-    if(buttonState[0] == HIGH){
-      Serial.println("G");
-      //buttonState[0] = LOW;  
-    }
-    if(buttonState[1] == HIGH){
-      Serial.println("R");
-      //buttonState[1] = LOW;  
-    }
-    if(buttonState[2] == HIGH){
-      Serial.println("B");
-      //buttonState[2] = LOW;  
-    }*/
-    
-    /*if (buttonState[0] && !digitalRead(BUTTON_YES)) {
-      Serial.println("G");
-      buttonState[0] = 0;
-    }
-    if (buttonState[1] && !digitalRead(BUTTON_NO)) {
-      Serial.println("R");
-      buttonState[1] = 0;
-      }
-    if (buttonState[2] && !digitalRead(BUTTON_UNSURE)) {
-      Serial.println("B");
-      buttonState[2] = 0;
-    }*/
-//    for (stateIncr = 0; stateIncr < 3; stateIncr++) {
-//      char curState = digitalRead(4 - stateIncr);
-//      if (buttonState[2 - stateIncr] > curState) {
-//        switch (stateIncr) {
-//     case 0:
-//      Serial.println("R");
-//      buttonState[0] = 0;
-//      case 1:
-//      Serial.println("G");
-//      buttonState[1] = 0;
-//     case 2:
-//      Serial.println("B");
-//      buttonState[2] = 0;
-//      default:
-//      break;
-//        }
-//      }
-//    }
-//  }  
-//  digitalWrite(LED_G, HIGH);
-//  delay(100);
-//  digitalWrite(LED_R, HIGH);
-//  delay(100);
-//  digitalWrite(LED_B, HIGH);
-//  delay(100);
-
-  
+ 
   
 }
