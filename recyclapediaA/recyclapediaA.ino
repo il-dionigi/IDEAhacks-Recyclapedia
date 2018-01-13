@@ -143,7 +143,7 @@ void loop() {
       }
     }
   } else { // statusIO > 0 -> writing
-    if (now() - curTime > 10000) { // 10 seconds passed
+    if (now() - curTime > 7000) { // 7 seconds passed
       statusIO *= -1;
       blinkLED(2);
     }
@@ -154,6 +154,10 @@ void loop() {
 
 void processInput() {
   if (input != -1) {
+    if (statusIO) { // true when writing)
+      Serial.println(input);
+    }
+    
     if (input == 0) {
       incrementCounter();
     } else if (input == 2) {
