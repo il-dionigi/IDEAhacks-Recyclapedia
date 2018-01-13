@@ -138,6 +138,7 @@ void setup() {
   digitalWrite(LED_R, LOW);
   digitalWrite(LED_B, LOW);
 
+  //Initiate the display as 0
   alpha4.writeDigitAscii(0, '0');
   alpha4.writeDigitAscii(1, '0');
   alpha4.writeDigitAscii(2, '0');
