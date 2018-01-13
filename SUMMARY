@@ -22,12 +22,12 @@ initialize function
 
 Functions on Arduino
 
-- int readRPi()
-- void writeRPi(String msg)
+- int readRPi()/void writeRPi(String msg) => we're using Serial read and serial write so don't need to implement
 - void incrementCounter()
-  - display library?
 - void controlLED(int LED, int power) - 1:red, 2:green, 3:blue, 0:powerOff, 1:powerOn
-- int buttonRead() - return 1 if read a button, 0 if no button read
+- int buttonRead(int buttonState[3]) - return 1 if read a button, 0 if no button read
+- void buttonPress(int buttonState) - Handles button presses 
+
 synchronization function?
 initialize function (setup R/W to serial and init counter)
 
