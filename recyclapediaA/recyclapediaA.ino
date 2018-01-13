@@ -8,8 +8,9 @@
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4(); 
 
 //***********************LEDS********************************
-#define LED_R 11
-#define LED_G 12
+const int startLED = 11;
+#define LED_G 11
+#define LED_R 12
 #define LED_B 13
 
 //**********************BUTTONS****************************
@@ -18,12 +19,19 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 #define BUTTON_UNSURE 2
 
 //*********************CONSTANTS****************************
+const short optionNO = 0;
+const short optionYES = 1;
+const short optionUNSURE = 2;
+
+//**********************GLOBALS*****************************
 long debounceDelay = 1500;
 long lastDebounceTime = 0;
 short valO = 0; // One's place
 short valD = 0; // Ten's place
 short valC = 0; // Hundred's place
 short valK = 0; // Thousand's place
+short statusIO = -1; // < 0 means reading, > 0 means writing
+short buttonState[] = {0, 0, 0}; // green, red, blue
 
 void buttonPress(int buttonState, char letter){
   if((millis() - lastDebounceTime) > debounceDelay){
@@ -70,10 +78,23 @@ void controlLED(const int LED, const int power){
 }
 
 //Return 1 if read a button, return 0 if no button read
-int buttonRead(int buttonState[3]){
-  int result = 0;
-  if(buttonState[0] == HIGH || buttonState[1] == HIGH || buttonState[2] == HIGH){
-    result = 1;  
+int buttonRead(){
+  int result = 2;
+
+  buttonState[0] = digitalRead(BUTTON_YES);
+  buttonState[1] = digitalRead(BUTTON_NO);
+  buttonState[2] = digitalRead(BUTTON_UNSURE);
+
+  buttonPress(buttonState[0], 'G');
+  buttonPress(buttonState[1], 'R');
+  buttonPress(buttonState[2], 'B');
+
+  if(buttonState[0] == HIGH) {
+    result = 0;  
+  } else if (buttonState[1] == HIGH) {
+    result = 1;
+  } else if (buttonState[2] == HIGH) {
+    result = 2;
   }
   return result; 
 }
@@ -111,14 +132,43 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  int buttonState[] = {0, 0, 0}; // green, red, blue
-  uint8_t stateIncr = 0;
+  if (statusIO < 0) { // reading
+   short input = -1;
+   if (Serial.available()) {
+     char inChar = Serial.read();
+     if (inChar != '\0') { // should be '0', '1', or '2'
+       input = inChar - '0';
+       if (input == 0) {
+         incrementCounter();
+       } else if (input == 2) {
+         statusIO *= -1;
+       }  
+       blinkLED(input);
+     }
+   }
+  } else { // statusIO > 0 -> writing
+    
+  }
+}
 
-  buttonState[0] = digitalRead(BUTTON_YES);
-  buttonState[1] = digitalRead(BUTTON_NO);
-  buttonState[2] = digitalRead(BUTTON_UNSURE);
-
-  buttonPress(buttonState[0], 'G');
-  buttonPress(buttonState[1], 'R');
-  buttonPress(buttonState[2], 'B');
+void blinkLED(int n) {
+  switch(LED) {
+    case 0:
+      controlLED(LED_R, HIGH);
+      delay(500);
+      controlLED(LED_R, LOW);
+      break;
+    case 1:
+      controlLED(LED_G, HIGH);
+      delay(500);
+      controlLED(LED_G, LOW); 
+      break;
+    case 2:
+      controlLED(LED_B, HIGH);
+      delay(500);
+      controlLED(LED_B, LOW);
+      break;
+    default:
+      break;
+  }
 }
