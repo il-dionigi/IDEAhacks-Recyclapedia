@@ -4,11 +4,11 @@
 #include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
 #include "Adafruit_LEDBackpack.h"
+#include <Wire.h> 
 
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4(); 
 
 //***********************LEDS********************************
-
 #define LED_R 11
 #define LED_G 12
 #define LED_B 13
@@ -22,9 +22,12 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 long debounceDelay = 1500;
 long lastDebounceTime = 0;
 int count = 0; 
+#define SLAVE_ADDRESS 0x04
 
 int readPi(){
+  while(Wire.available()){
     
+  }
 }
 
 void writePi(String msg) {
@@ -90,9 +93,24 @@ void setup() {
   pinMode(BUTTON_NO, INPUT);
   pinMode(BUTTON_UNSURE, INPUT);
 
+  //Initialize Arduino as Slave
+  Wire.begin(SLAVE_ADDRESS);
+  Wire.onReceive(readPi);
+  Wire.onRequest(writePi);
+  
   Serial.begin(9600);
   alpha4.begin(0x70); //pass in the address for the display
-  Serial.println("Setup complete..");
+
+  //Signal that the signal is ready 
+  digitalWrite(LED_G, HIGH);
+  delay(500);
+  digitalWrite(LED_R, HIGH);
+  delay(500);
+  digitalWrite(LED_B, HIGH);
+  delay(500);
+  digitalWrite(LED_G, LOW);
+  digitalWrite(LED_R, LOW);
+  digitalWrite(LED_B, LOW);
 }
 
 void loop() {
