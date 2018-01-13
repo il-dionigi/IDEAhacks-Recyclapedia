@@ -4,6 +4,7 @@
 #include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
 #include "Adafruit_LEDBackpack.h"
+#include <Time.h>
 
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4(); 
 
@@ -32,6 +33,7 @@ short valC = 0; // Hundred's place
 short valK = 0; // Thousand's place
 short statusIO = -1; // < 0 means reading, > 0 means writing
 short buttonState[] = {0, 0, 0}; // green, red, blue
+time_t curTime = 0;
 
 void buttonPress(int buttonState, char letter){
   if((millis() - lastDebounceTime) > debounceDelay){
@@ -131,23 +133,36 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  short input = -1:
   if (statusIO < 0) { // reading
-   short input = -1;
-   if (Serial.available()) {
-     char inChar = Serial.read();
-     if (inChar != '\0') { // should be '0', '1', or '2'
-       input = inChar - '0';
-       if (input == 0) {
-         incrementCounter();
-       } else if (input == 2) {
-         statusIO *= -1;
-       }  
-       blinkLED(input);
-     }
-   }
+    if (Serial.available()) {
+      char inChar = Serial.read();
+      if (inChar != '\0') { // should be '0', '1', or '2'
+        input = inChar - '0';
+        processInput();
+      }
+    }
   } else { // statusIO > 0 -> writing
-    
+    if (now() - curTime > 10000) { // 10 seconds passed
+      statusIO *= -1;
+      blinkLED(2);
+    }
+    input = buttonRead();
+    processInput();    
+  }
+}
+
+void processInput() {
+  if (input != -1) {
+    if (input == 0) {
+      incrementCounter();
+    } else if (input == 2) {
+      if (!statusIO) { // true when reading
+        curTime = now();
+      }
+      statusIO *= -1;
+    }
+    blinkLED(input);
   }
 }
 
