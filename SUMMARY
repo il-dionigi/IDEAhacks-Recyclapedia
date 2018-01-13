@@ -1,0 +1,34 @@
+Interface b/w RPi & Arduino (send&receive messages)
+P -> A				A -> P
+* yes, is recycable		* yes button
+* no, is not recycable		* no button
+* don't know (not in database)	* idk button
+* acknowledgement		* acknowledgement
+  * channel open		  * channel open
+  * channel closed		  * channel closed
+
+To consider later: interace b/w barcode scanning software & RPi
+
+Functions on RPi
+
+- int tryScan() - return 0 if nothing, long if scanned barcode
+- void writeArduino(String msg)
+- String readArduino()
+- int databaseSearch() - return 0 if not found, 1 if found
+- void databaseWrite(String entry)
+- void databaseInit() - read from params file
+synchronization function?
+initialize function
+
+Functions on Arduino
+
+- int readRPi()
+- void writeRPi(String msg)
+- void incrementCounter()
+  - display library?
+- void controlLED(int LED, int power) - 1:red, 2:green, 3:blue, 0:powerOff, 1:powerOn
+- int buttonRead() - return 1 if read a button, 0 if no button read
+synchronization function?
+initialize function (setup R/W to serial and init counter)
+
+Note: Keep track of count following shutdown by storing on RPi
