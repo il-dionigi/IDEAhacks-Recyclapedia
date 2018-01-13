@@ -5,7 +5,9 @@
 #include <gfxfont.h>
 #include "Adafruit_LEDBackpack.h"
 #include <Time.h>
+#include <Servo.h>
 
+Servo myServo;
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4(); 
 
 //***********************LEDS********************************
@@ -34,6 +36,15 @@ short valK = 0; // Thousand's place
 short statusIO = -1; // < 0 means reading, > 0 means writing
 short buttonState[] = {0, 0, 0}; // green, red, blue
 time_t curTime = 0;
+
+//*************HELPER FUNCTIONS FOR DISPENSER***************
+void openDispenser(){
+  myServo.write(90);    
+}
+
+void closeDispenser(){
+  myServo.write(0);  
+}
 
 void buttonPress(int buttonState, char letter){
   if((millis() - lastDebounceTime) > debounceDelay){
@@ -112,6 +123,8 @@ void setup() {
   pinMode(BUTTON_UNSURE, INPUT);
   
   Serial.begin(9600);
+  myServo.attach(9); 
+  myServo.write(0); 
   alpha4.begin(0x70); //pass in the address for the display
 
   //Signal that the signal is ready 
