@@ -20,17 +20,10 @@ Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4();
 //*********************CONSTANTS****************************
 long debounceDelay = 1500;
 long lastDebounceTime = 0;
-int count = 0; 
-
-void readPi(int numByte){
-  while(Wire.available()){
-    
-  }
-}
-
-void writePi() {
-  
-}
+short valO = 0; // One's place
+short valD = 0; // Ten's place
+short valC = 0; // Hundred's place
+short valK = 0; // Thousand's place
 
 void buttonPress(int buttonState, char letter){
   if((millis() - lastDebounceTime) > debounceDelay){
@@ -42,11 +35,6 @@ void buttonPress(int buttonState, char letter){
 }
 
 void incrementCounter(){
-  short valO = 0; // One's place
-  short valD = 0; // Ten's place
-  short valC = 0; // Hundred's place
-  short valK = 0; // Thousand's place
-  
   valO++;
   valD += (int)(valO/10);
   valO = valO % 10;
@@ -55,10 +43,10 @@ void incrementCounter(){
   valK += (int)(valC/10);
   valC = valC % 10;
 
-  alpha4.writeDigitAscii(0, '0' + valO);
-  alpha4.writeDigitAscii(1, '0' + valD);
-  alpha4.writeDigitAscii(2, '0' + valC);
-  alpha4.writeDigitAscii(3, '0' + valK);
+  alpha4.writeDigitAscii(3, '0' + valO);
+  alpha4.writeDigitAscii(2, '0' + valD);
+  alpha4.writeDigitAscii(1, '0' + valC);
+  alpha4.writeDigitAscii(0, '0' + valK);
   alpha4.writeDisplay();
 }
 
@@ -113,6 +101,12 @@ void setup() {
   digitalWrite(LED_G, LOW);
   digitalWrite(LED_R, LOW);
   digitalWrite(LED_B, LOW);
+
+  alpha4.writeDigitAscii(0, '0');
+  alpha4.writeDigitAscii(1, '0');
+  alpha4.writeDigitAscii(2, '0');
+  alpha4.writeDigitAscii(3, '0');
+  alpha4.writeDisplay();
 }
 
 void loop() {
@@ -127,6 +121,4 @@ void loop() {
   buttonPress(buttonState[0], 'G');
   buttonPress(buttonState[1], 'R');
   buttonPress(buttonState[2], 'B');
- 
-  
 }
