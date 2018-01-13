@@ -11,15 +11,15 @@ Servo myServo;
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4(); 
 
 //***********************LEDS********************************
-const int startLED = 11;
-#define LED_G 11
-#define LED_R 12
-#define LED_B 13
+const int startLED = 2;
+#define LED_G 2
+#define LED_R 3
+#define LED_B 4
 
 //**********************BUTTONS****************************
-#define BUTTON_YES 4
-#define BUTTON_NO 3
-#define BUTTON_UNSURE 2
+#define BUTTON_YES 12
+#define BUTTON_NO 11
+#define BUTTON_UNSURE 10
 
 //*********************CONSTANTS****************************
 const short optionNO = 0;
