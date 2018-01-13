@@ -37,12 +37,38 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  digitalWrite(LED_G, HIGH);
-  delay(100);
-  digitalWrite(LED_R, HIGH);
-  delay(100);
-  digitalWrite(LED_B, HIGH);
-  delay(100);
+  char buttonState[] = {0, 0, 0}; // red, green, blue
+  uint8_t stateIncr = 0;
+
+  while (1) {
+    for (stateIncr = 0; stateIncr < 3; stateIncr++) {
+      char curState = digitalRead(4 - stateIncr);
+      if (buttonState[2 - stateIncr] > curState) {
+        switch (stateIncr) {
+ 	  case 0:
+	    digitalWrite(LED_R, HIGH);
+	    delay(100);
+	    digitalWrite(LED_R, HIGH);
+  	  case 1:
+	    digitalWrite(LED_G, HIGH);
+	     delay(100);
+	    digitalWrite(LED_G, HIGH);		
+	  case 2:
+	    digitalWrite(LED_B, HIGH);
+	    delay(100);
+	    digitalWrite(LED_B, HIGH);
+  	  default:
+	    break;
+        }
+      }
+    }
+  }  
+//  digitalWrite(LED_G, HIGH);
+//  delay(100);
+//  digitalWrite(LED_R, HIGH);
+//  delay(100);
+//  digitalWrite(LED_B, HIGH);
+//  delay(100);
 
   
   
