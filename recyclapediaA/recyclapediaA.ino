@@ -4,7 +4,7 @@
 #include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
 #include "Adafruit_LEDBackpack.h"
-#include <Time.h>
+#include <TimeLib.h>
 #include <Servo.h>
 
 Servo myServo;
@@ -35,6 +35,7 @@ short valC = 0; // Hundred's place
 short valK = 0; // Thousand's place
 short statusIO = -1; // < 0 means reading, > 0 means writing
 short buttonState[] = {0, 0, 0}; // green, red, blue
+short input = -1;
 time_t curTime = 0;
 
 //*************HELPER FUNCTIONS FOR DISPENSER***************
@@ -147,7 +148,7 @@ void setup() {
 }
 
 void loop() {
-  short input = -1:
+  input = -1;
   if (statusIO < 0) { // reading
     if (Serial.available()) {
       char inChar = Serial.read();
@@ -185,7 +186,7 @@ void processInput() {
 }
 
 void blinkLED(int n) {
-  switch(LED) {
+  switch(n) {
     case 0:
       controlLED(LED_R, HIGH);
       delay(500);
