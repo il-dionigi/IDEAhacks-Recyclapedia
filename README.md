@@ -13,7 +13,7 @@ Our product would be best for those who either don't know how recycling works in
 
 **How It Works**
 
-If the user is ever curious about whether or not something is recyclable, they simply walk up with their trash and scan their barcode. If the Recyclapedia has seen the barcode before and knows it is recyclable, it will pulse a green LED, increment the count of recycled items, and will proactively help the user upon them reaching for a Sugary Treat and Reward (STaR). If the system knows that the item is no recyclable, it will simply pulse the red LED. On the item not being known, the blue LED is pulsed and the Recyclapedia waits for the user to press a button corresponding to whether or not that item is recyclable. Once given a response, the Recyclapedia stores this to memory for future use and does the other corresponding actions.
+If the user is ever curious about whether or not something is recyclable, they simply walk up with their trash and scan their barcode. If the Recyclapedia has seen the barcode before and knows it is recyclable, it will pulse a green LED, increment the count of recycled items, and award the user if they reach for a Sugary Treat and Reward (STaR). If the system knows that the item is no recyclable, it will simply pulse the red LED. On the item not being known, the blue LED is pulsed and the Recyclapedia waits for the user to press a button corresponding to whether or not that item is recyclable. Once given a response, the Recyclapedia stores this to memory for future use and does the other corresponding actions.
 
 **Hardware**
 * [Arduino Uno](https://www.adafruit.com/product/50)
