@@ -8,6 +8,7 @@ Created on Sat Jan 13 14:06:25 2018
 import zbar
 import zbar.misc
 import matplotlib.image as mpimg
+import scan_image
 
 def check_database(database, barcode):
     if barcode in database:
@@ -42,16 +43,14 @@ def barcode_scanner():
     # if not str, return 0
     # else, return results[0][1]?
     #results = DBR.decodeFile('monster.jpg')
-    img = mpimg.imread('monster.jpg')
-    scanner = zbar.Scanner()
-    results = scanner.scan(img)
-    if (results):
-        print(results)
+    barcode = scan_image.read_barcode('monster.jpg')
+    if (barcode):
+        print(barcode)
     else:
         print('No barcode found')
     # acting as a stub right now; replace when appropriate
     # return 0 if no barcode; otherwise return barcode value
-    return '5060166693732'
+    return barcode
     
 def loop(database):
     while(True):
