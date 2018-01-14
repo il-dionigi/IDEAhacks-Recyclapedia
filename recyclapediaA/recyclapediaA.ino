@@ -11,9 +11,8 @@ Servo myServo;
 Adafruit_AlphaNum4 alpha4 = Adafruit_AlphaNum4(); 
 
 //***********************LEDS********************************
-const int startLED = 2;
-#define LED_G 2
-#define LED_R 3
+#define LED_R 2
+#define LED_G 3
 #define LED_B 4
 
 //**********************BUTTONS****************************
@@ -26,16 +25,18 @@ const short optionNO = 0;
 const short optionYES = 1;
 const short optionUNSURE = 2;
 
+//*******************MISCELLANIOUS**************
+#define displayPin 9
+#define pirPin 6
+
 //**********************GLOBALS*****************************
 long debounceDelay = 1500;
 long lastDebounceTime = 0;
-short valO = 0; // One's place
-short valD = 0; // Ten's place
-short valC = 0; // Hundred's place
-short valK = 0; // Thousand's place
+short counterVals[] = {0, 0, 0, 0};
 short statusIO = -1; // < 0 means reading, > 0 means writing
 short buttonState[] = {0, 0, 0}; // green, red, blue
 short input = -1;
+short initCount = 0;
 time_t curTime = 0;
 
 //*************HELPER FUNCTIONS FOR DISPENSER***************
@@ -47,61 +48,40 @@ void closeDispenser(){
   myServo.write(0);  
 }
 
-void buttonPress(int buttonState, char letter){
+void buttonPress(int buttonState){
   if((millis() - lastDebounceTime) > debounceDelay){
     if(buttonState == HIGH){
-      Serial.println(letter);
       lastDebounceTime = millis();  
     }
   }
 }
 
 void incrementCounter(){
-  valO++;
-  valD += (int)(valO/10);
-  valO = valO % 10;
-  valC += (int)(valD/10);
-  valD = valD % 10;
-  valK += (int)(valC/10);
-  valC = valC % 10;
+  counterVals[3]++;
+  counterVals[2] += (short)(counterVals[3]/10);
+  counterVals[3] = counterVals[3] % 10;
+  counterVals[1] += (short)(counterVals[2]/10);
+  counterVals[2] = counterVals[2] % 10;
+  counterVals[0] += (short)(counterVals[1]/10);
+  counterVals[1] = counterVals[1] % 10;
 
-  alpha4.writeDigitAscii(3, '0' + valO);
-  alpha4.writeDigitAscii(2, '0' + valD);
-  alpha4.writeDigitAscii(1, '0' + valC);
-  alpha4.writeDigitAscii(0, '0' + valK);
+  for (short i = 0; i < 4; i++) {
+    alpha4.writeDigitAscii(i, '0' + counterVals[i]);
+  }
   alpha4.writeDisplay();
-}
-
-//1:red, 2:green, 3:blue, 0:powerOff, 1:powerOn
-void controlLED(const int LED, const int power){
-  if(LED == 1 && power == 0){
-    digitalWrite(LED_R, LOW); 
-  } else {
-    digitalWrite(LED_R, HIGH);
-  }
-  if(LED == 2 && power == 0){
-    digitalWrite(LED_G, LOW);  
-  } else {
-    digitalWrite(LED_G, HIGH);
-  }
-  if(LED == 3 && power == 0){
-    digitalWrite(LED_B, LOW);  
-  } else {
-    digitalWrite(LED_B, HIGH);  
-  }
 }
 
 //Return 1 if read a button, return 0 if no button read
 int buttonRead(){
-  int result = 2;
+  int result = -1;
 
-  buttonState[0] = digitalRead(BUTTON_YES);
-  buttonState[1] = digitalRead(BUTTON_NO);
+  buttonState[0] = digitalRead(BUTTON_NO);
+  buttonState[1] = digitalRead(BUTTON_YES);
   buttonState[2] = digitalRead(BUTTON_UNSURE);
 
-  buttonPress(buttonState[0], 'G');
-  buttonPress(buttonState[1], 'R');
-  buttonPress(buttonState[2], 'B');
+  buttonPress(buttonState[0]);
+  buttonPress(buttonState[1]);
+  buttonPress(buttonState[2]);
 
   if(buttonState[0] == HIGH) {
     result = 0;  
@@ -110,21 +90,32 @@ int buttonRead(){
   } else if (buttonState[2] == HIGH) {
     result = 2;
   }
+  
+  return result; 
+}
+
+bool motionTriggered(){
+  bool result = false;
+  if(digitalRead(pirPin) == HIGH){
+    result = true;  
+  }  
   return result; 
 }
 
 void setup() {
   // put your setup code here, to run once:
+  pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
   pinMode(LED_B, OUTPUT);
-  pinMode(LED_R, OUTPUT);
 
   pinMode(BUTTON_YES, INPUT);
   pinMode(BUTTON_NO, INPUT);
   pinMode(BUTTON_UNSURE, INPUT);
+
+  pinMode(pirPin, INPUT);
   
   Serial.begin(9600);
-  myServo.attach(9); 
+  myServo.attach(displayPin); 
   myServo.write(0); 
   alpha4.begin(0x70); //pass in the address for the display
 
@@ -140,14 +131,24 @@ void setup() {
   digitalWrite(LED_B, LOW);
 
   //Initiate the display as 0
-  alpha4.writeDigitAscii(0, '0');
-  alpha4.writeDigitAscii(1, '0');
-  alpha4.writeDigitAscii(2, '0');
-  alpha4.writeDigitAscii(3, '0');
+  for (short i = 0; i < 4; i++) {
+    alpha4.writeDigitAscii(i, '0');
+  }
   alpha4.writeDisplay();
 }
 
 void loop() {
+  short place = 0;
+  while (!initCount) {
+    if (Serial.available()) {
+      counterVals[place] = Serial.read() - '0';
+      alpha4.writeDigitAscii(place, counterVals[place] + '0');
+      if (++place == 4) {
+        initCount = 1;
+        alpha4.writeDisplay();
+      }
+    }
+  }
   input = -1;
   if (statusIO < 0) { // reading
     if (Serial.available()) {
@@ -173,34 +174,43 @@ void processInput() {
       Serial.println(input);
     }
     
-    if (input == 0) {
+    blinkLED(input);
+    if (input == 1) {
       incrementCounter();
-    } else if (input == 2) {
+      curTime = now();
+      while (now() - curTime < 3000) {
+        if (motionTriggered()) {
+          openDispenser();
+          break;
+        }
+      }
+      delay(3000);
+      closeDispenser();
+      } else if (input == 2) {
       if (!statusIO) { // true when reading
         curTime = now();
       }
       statusIO *= -1;
     }
-    blinkLED(input);
   }
 }
 
 void blinkLED(int n) {
   switch(n) {
     case 0:
-      controlLED(LED_R, HIGH);
-      delay(500);
-      controlLED(LED_R, LOW);
+      digitalWrite(LED_R, HIGH);
+      delay(1000);
+      digitalWrite(LED_R, LOW);
       break;
     case 1:
-      controlLED(LED_G, HIGH);
-      delay(500);
-      controlLED(LED_G, LOW); 
+      digitalWrite(LED_G, HIGH);
+      delay(1000);
+      digitalWrite(LED_G, LOW); 
       break;
     case 2:
-      controlLED(LED_B, HIGH);
-      delay(500);
-      controlLED(LED_B, LOW);
+      digitalWrite(LED_B, HIGH);
+      delay(1000);
+      digitalWrite(LED_B, LOW);
       break;
     default:
       break;
