@@ -3,7 +3,6 @@
 #include <Adafruit_SPITFT.h>
 #include <Adafruit_SPITFT_Macros.h>
 #include <gfxfont.h>
-#include "Adafruit_LEDBackpack.h"
 #include <TimeLib.h>
 #include <Servo.h>
 
