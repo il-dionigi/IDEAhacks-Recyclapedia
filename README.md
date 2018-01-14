@@ -1,5 +1,4 @@
-
-# IDEAhacks-recyclopedia
+# IDEAhacks-Recyclopedia
 
 Work done as part of IDEA Hacks 2018 hosted by the division of the Institute of Electrical and Electronics Engineers at UCLA during the Winter Quarter of the 2017-2018 school year.
 ****
