@@ -2,7 +2,12 @@ import serial
 import time
 import os.path
 from mcr12_serial import BarcodeScanner
+import RPi.GPIO as GPIO
 
+# setup GPIO
+GPIO.setmode(GPIO.BCM)
+INPUT_PIN = 11
+GPIO.setup(INPUT_PIN, GPIO.IN)
 # hard-coding the relevant files
 file_name = 'params.txt'
 count_file_name = 'count.txt'
@@ -53,37 +58,37 @@ def increment_lifetime_count():
 # alert Arduino and update count and database if necessary upon barcode scan
 def loop(database, ser):
     while(True):
-        time.sleep(2)
-        barcode = bcd.scan()
-        print(barcode)
-        if (barcode):
-            if (barcode in database):
-                print('Barcode found in database.')
-                if database[barcode] == '1':
-                    increment_lifetime_count()
-                print(database[barcode][0])
-                ser.write(database[barcode][0])
-                time.sleep(2) # sleep for a bit after sending message to Arduino
-            else:
-                print('Barcode not found in database.')
-                print('2')
-                ser.write('2')
-                time.sleep(0.2)
-                ser.reset_input_buffer()
-                time.sleep(0.1)
-                response = ser.readline()
-                if (response):
-                    print('response: ' + response)
-                    print('response[0]: ' + response[0])
-                    if(response[0] != '2'):
-                        write_database(database, barcode, response[0])
+        if (GPIO.input(INPUT_PIN)):
+            barcode = bcd.scan()
+            print(barcode)
+            if (barcode):
+                if (barcode in database):
+                    print('Barcode found in database.')
+                    if database[barcode] == '1':
+                        increment_lifetime_count()
+                    print(database[barcode][0])
+                    ser.write(database[barcode][0])
+                    time.sleep(4) # sleep for a bit after sending message to Arduino
+                else:
+                    print('Barcode not found in database.')
+                    print('2')
+                    ser.write('2')
+                    time.sleep(0.2)
+                    ser.reset_input_buffer()
+                    time.sleep(0.1)
+                    response = ser.readline()
+                    if (response):
+                        print('response: ' + response)
+                        print('response[0]: ' + response[0])
+                        if(response[0] != '2'):
+                            write_database(database, barcode, response[0])
 
 # initialize serial connection and database, then begin the infinite loop
 def main():
     ser = serial.Serial('/dev/ttyACM1', 9600, timeout=8)
     database = initialize_database()
     # send lifetime count
-    time.sleep(10)
+    time.sleep(7)
     print(make_lifetime_count_string())
     ser.write(make_lifetime_count_string())
     loop(database, ser)
