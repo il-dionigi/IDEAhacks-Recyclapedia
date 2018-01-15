@@ -33,7 +33,9 @@ If the user is ever curious about whether or not something is recyclable, they s
 
 **Demos**
 
-Here is a link to a video
+[Link](https://github.com/il-dionigi/IDEAhacks-Recyclopedia/blob/master/demos/demo-recyclable.mp4) - Testing a recyclable item
+[Link](https://github.com/il-dionigi/IDEAhacks-Recyclopedia/blob/master/demos/demo-adding-recyclable.mp4) - Adding a new recyclable
+[Link](https://github.com/il-dionigi/IDEAhacks-Recyclopedia/blob/master/demos/demo-overall-counter.mp4) - Testing recyclable and non-recyclable
 
 ****
 **Collaborators:**  
