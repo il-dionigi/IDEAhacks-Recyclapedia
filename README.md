@@ -19,7 +19,7 @@ If the user is ever curious about whether or not something is recyclable, they s
 * [Alphanumeric Display](https://www.adafruit.com/product/1907)
 * [PIR Sensor](https://www.adafruit.com/product/189)
 * [Power HD Micro Servo](https://www.pololu.com/product/1049)
-* [RaspberryPi Model 3](https://www.adafruit.com/product/3055)
+* [Raspberry Pi Model 3](https://www.adafruit.com/product/3055)
 
 **Software**
 
